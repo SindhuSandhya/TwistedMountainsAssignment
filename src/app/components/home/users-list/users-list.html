@@ -1,0 +1,75 @@
+<div class="col-lg-12">
+  <table class="table table-bordered table-striped table-hover table-responsive scrollable">
+    <thead>
+      <tr>
+        <th *ngFor="let header of headers; let i = index" [ngClass]="{'text-center': i === 0}">{{ header }}</th>
+        <!-- <th [ngClass]="{'text-center': headers.length === 0}">Actions</th> -->
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let user of paginatedUsers; let rowIdx = index; trackBy: trackByUserId" (click)="onRowClick(user, $event)">
+        <td *ngFor="let header of headers; let colIdx = index">
+          <span *ngIf="!isCellEditing(rowIdx, colIdx) && !isRowEditing(rowIdx)"
+                (click)="startEdit(rowIdx, colIdx, $event)">
+            {{ user[header.toLowerCase()] }}
+          </span>
+          <div *ngIf="isCellEditing(rowIdx, colIdx)" class="d-flex align-items-center">
+            <input [value]="tempValues[rowIdx + '-' + colIdx] || user[header.toLowerCase()]" 
+                   (input)="onCellInput(rowIdx, colIdx, $event)"
+                   (keydown.enter)="saveCellEdit(rowIdx, colIdx, $event)" 
+                   (keydown.esc)="cancelEdit($event)"
+                   (click)="$event.stopPropagation()"
+                   class="form-control form-control-sm me-2" 
+                   #cellInput autofocus />
+            <button class="btn btn-sm btn-success me-1" 
+                    (click)="saveCellEdit(rowIdx, colIdx, $event)">
+              ✓
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="cancelEdit($event)">
+              ✕
+            </button>
+          </div>
+          <input *ngIf="!isCellEditing(rowIdx, colIdx) && isRowEditing(rowIdx)"
+                 [value]="tempValues[rowIdx + '-' + colIdx] || user[header.toLowerCase()]" 
+                 (input)="onCellInput(rowIdx, colIdx, $event)"
+                 (keydown.enter)="$event.preventDefault()" 
+                 (keydown.esc)="cancelEdit($event)"
+                 (click)="$event.stopPropagation()"
+                 class="form-control form-control-sm" />
+        </td>
+        <!-- <td>
+          <button *ngIf="!isRowEditing(rowIdx)" 
+                  class="btn btn-sm btn-primary" 
+                  (click)="startEditRow(rowIdx, $event)">
+            Edit
+          </button>
+          <div *ngIf="isRowEditing(rowIdx)" class="btn-group">
+            <button class="btn btn-sm btn-success" 
+                    (click)="saveRow(rowIdx, $event)">
+              Update
+            </button>
+            <button class="btn btn-sm btn-secondary" 
+                    (click)="cancelEdit($event)">
+              Cancel
+            </button>
+          </div>
+        </td> -->
+      </tr>
+    </tbody>
+  </table>
+  <nav aria-label="User list pagination" style="margin-top: 16px;">
+    <ul class="pagination justify-content-center">
+      <li class="page-item" [class.disabled]="currentPage === 1">
+        <button class="page-link" (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1">Prev</button>
+      </li>
+      <li class="page-item disabled">
+        <span class="page-link">Page {{ currentPage }} of {{ totalPages }}</span>
+      </li>
+      <li class="page-item" [class.disabled]="currentPage === totalPages">
+        <button class="page-link" (click)="goToPage(currentPage + 1)"
+          [disabled]="currentPage === totalPages">Next</button>
+      </li>
+    </ul>
+  </nav>
+</div>
